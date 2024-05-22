@@ -1,0 +1,136 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Ratings Table</title>-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--    <style>-->
+<!--        table {-->
+<!--            width: 100%;-->
+<!--            border-collapse: collapse;-->
+<!--        }-->
+<!--        th, td {-->
+<!--            border: 1px solid black;-->
+<!--            text-align: center;-->
+<!--            padding: 8px;-->
+<!--        }-->
+<!--        th {-->
+<!--            position: sticky;-->
+<!--            top: 0;-->
+<!--            background: #f1f1f1;-->
+<!--        }-->
+<!--        th.left-sticky {-->
+<!--            position: sticky;-->
+<!--            left: 0;-->
+<!--            background: #f1f1f1;-->
+<!--        }-->
+<!--        select {-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--            border: none;-->
+<!--            background: transparent;-->
+<!--            padding: 4px;-->
+<!--            text-align-last: center;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Ratings Table</h1>-->
+<!--    <table id="ratingsTable">-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th class="left-sticky">User ID</th>-->
+<!--                {% for item_id in range(1, 6) %}-->
+<!--                <th>Item {{ item_id }}</th>-->
+<!--                {% endfor %}-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--            {% for user_id, items in ratings_dict.items() %}-->
+<!--            <tr>-->
+<!--                <td class="left-sticky">{{ user_id }}</td>-->
+<!--                {% for item_id in range(1, 6) %}-->
+<!--                <td>-->
+<!--                    <select>-->
+<!--                        <option value="" {% if items[item_id] is none %}selected{% endif %}>None</option>-->
+<!--                        <option value="1" {% if items[item_id] == 1 %}selected{% endif %}>1</option>-->
+<!--                        <option value="2" {% if items[item_id] == 2 %}selected{% endif %}>2</option>-->
+<!--                        <option value="3" {% if items[item_id] == 3 %}selected{% endif %}>3</option>-->
+<!--                        <option value="4" {% if items[item_id] == 4 %}selected{% endif %}>4</option>-->
+<!--                        <option value="5" {% if items[item_id] == 5 %}selected{% endif %}>5</option>-->
+<!--                    </select>-->
+<!--                </td>-->
+<!--                {% endfor %}-->
+<!--            </tr>-->
+<!--            {% endfor %}-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--    <button id="printButton">Show Predictions</button>-->
+
+<!--    <div id="updatedRatingsContainer" style="margin-top: 20px;"></div>-->
+<!--    <div id="coldStartProblem"></div>-->
+
+<!--    <script>-->
+<!--        $(document).ready(function() {-->
+<!--            $('#printButton').click(function() {-->
+<!--                let ratings = {};-->
+<!--                $('#ratingsTable tbody tr').each(function() {-->
+<!--                    let userId = $(this).find('td').eq(0).text();-->
+<!--                    ratings[userId] = {};-->
+<!--                    $(this).find('td').each(function(index) {-->
+<!--                        if (index > 0) {-->
+<!--                            let itemId = index;-->
+<!--                            let ratingValue = $(this).find('select').val();-->
+<!--                            ratingValue = ratingValue ? parseFloat(ratingValue) : null;-->
+<!--                            ratings[userId][itemId] = ratingValue;-->
+<!--                        }-->
+<!--                    });-->
+<!--                });-->
+
+<!--                $.ajax({-->
+<!--                    type: 'POST',-->
+<!--                    url: '/update',-->
+<!--                    contentType: 'application/json',-->
+<!--                    data: JSON.stringify({ ratings: ratings }),-->
+<!--                    success: function(response) {-->
+<!--                        if (response.success) {-->
+<!--                            let updatedRatings = response.ratings;-->
+<!--                            let newTable = '<h2>Updated Ratings Table</h2><table><thead><tr><th>User ID</th>';-->
+<!--                            for (let i = 1; i <= 5; i++) {-->
+<!--                                newTable += `<th>Item ${i}</th>`;-->
+<!--                            }-->
+<!--                            newTable += '</tr></thead><tbody>';-->
+
+<!--                            for (let userId in updatedRatings) {-->
+<!--                                newTable += `<tr><td>${parseInt(userId)}</td>`;-->
+<!--                                let userRatings = updatedRatings[userId];-->
+<!--                                let ratingsDict = {};-->
+<!--                                userRatings.forEach(ratingObj => {-->
+<!--                                    let itemId = Object.keys(ratingObj)[0];-->
+<!--                                    ratingsDict[itemId] = ratingObj[itemId];-->
+<!--                                });-->
+<!--                                for (let itemId = 1; itemId <= 5; itemId++) {-->
+<!--                                    let rating = ratingsDict[itemId] !== undefined ? ratingsDict[itemId] : 'None';-->
+<!--                                    newTable += `<td>${rating}</td>`;-->
+<!--                                }-->
+<!--                                newTable += '</tr>';-->
+<!--                            }-->
+<!--                            newTable += '</tbody></table>';-->
+<!--                            $('#updatedRatingsContainer').html(newTable);-->
+<!--                        }-->
+<!--                        if(response.cold_start_problem){-->
+<!--                            message = "Print Here,  your Cold Start Problem Message"-->
+<!--                            $('#coldStartProblem').html(message);-->
+<!--                        }else{-->
+<!--                            $('#coldStartProblem').html(" ");-->
+<!--                        }-->
+<!--                    },-->
+<!--                    error: function(error) {-->
+<!--                        console.error('Error updating ratings:', error);-->
+<!--                    }-->
+<!--                });-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
